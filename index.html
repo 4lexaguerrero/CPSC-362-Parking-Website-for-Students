@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotter</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+
+    <header class="site_header">
+      <div class="inner_header">
+        <a class="title1">Titan Spot Watch</a>
+        <nav class="nav_links">
+          <a href="login.html" class="loginbtn">Log in</a>
+          <a href="signup.html" class="signupbtn">Sign up</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero_content">
+          <h1>Welcome to Spotter</h1>
+          <p>See the actual number of parking spots, get updated on the status of
+            each structure and log where you parked to help fellow students.</p>
+          <div class="hero_count">
+            <a href="#board" class="livecountbtn">See live counts</a>
+          </div>
+        </div>
+
+        <div class="board" id="board" aria-label="Live parking structure counts">
+          <div class="board-head">
+            <span class="board-title">Live Structure Counts</span>
+            <span class="board-updated">Updated <time id="last-updated">2 min ago</time></span>
+          </div>
+
+          <ul class="board_rows">
+            <li class="board_row" data-status="open">
+              <span class="row-name">Nutwood Structure</span>
+              <span class="row-count">582</span>
+            </li>
+            <li class="board_row" data-status="open">
+              <span class="row-name">State College Structure</span>
+              <span class="row-count">1,054</span>
+            </li>
+            <li class="board_row" data-status="open">
+              <span class="row-name">Eastside North</span>
+              <span class="row-count">391</span>
+            </li>
+            <li class="board_row" data-status="open">
+              <span class="row-name">Eastside South</span>
+              <span class="row-count">Full</span>
+            </li>
+            <li class="board_row" data-status="open">
+              <span class="row-name">S8 / S10</span>
+              <span class="row-count">47</span>
+          </ul>
+        </div>
+      </section>
+
+      <section class="how-it-works">
+        <h2>Three simple things</h2>
+        <ol class="how-steps">
+          <li>
+            <span class="how-num"></span>
+            <h3>Park</h3>
+            <p>Park into whichever structure you choose that has room.</p>
+          </li>
+          <li>
+            <span class="how-num"></span>
+            <h3>Log it</h3>
+            <p>Log into your account and enter the structure and level you're on.</p>
+          </li>
+          <li>
+            <span class="how-num"></span>
+            <h3>See real counts</h3>
+            <p>Your report blends with everyone else's live</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="final">
+        <a href="signup.html" class="accountbtn">Get Started</a>
+      </section>
+    </main>
+
+    <footer class="site_footer">
+      <div class="inner_footer">
+        <p>Built by CSUF students fro CSUF students</p>
+      </div>
+    </footer>
+  </body>
+</html>
