@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+
+    <header class="site_header">
+      <div class="inner_header">
+        <a href="index.html" class="title1">Titan Spot Watch</a>
+        <nav class="nav_links">
+          <a href="login.html" class="loginbtn">Log in</a>
+          <a href="signup.html" class="signupbtn">Sign up</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="signup_section">
+        <form class="auth_form" id="signup-form">
+          <h1>Create your account</h1>
+          <p class="auth1">Join Spotter to log where you parked and see real counts.</p>
+
+          <div class="form_group">
+            <label for="signup-name">Full name</label>
+            <input type="text" id="signup-name" name="name" required autocomplete="name" />
+          </div>
+
+          <div class="form_group">
+            <label for="signup-email">Email</label>
+            <input type="email" id="signup-email" name="email" required autocomplete="email" />
+          </div>
+
+          <div class="form_group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" name="password" required autocomplete="new-password" minlength="8" />
+          </div>
+
+          <div class="form_group">
+            <label for="signup-password-confirm">Confirm password</label>
+            <input type="password" id="signup-password-confirm" name="password_confirm" required autocomplete="new-password" minlength="8" />
+          </div>
+
+          <button type="submit" class="authbtn">Sign up</button>
+
+          <p class="auth_switch" class="auth_submit">Already have an account?
+            <a href="login.html">Log in</a></p>
+        </form>
+      </section>
+    </main>
+    <footer class="site_footer">
+      <div class="inner_footer">
+        <p>Built by CSUF students for CSUF students</p>
+      </div>
+  </body>
+</html>
