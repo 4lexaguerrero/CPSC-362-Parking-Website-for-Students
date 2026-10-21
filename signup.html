@@ -10,44 +10,53 @@
 
     <header class="site_header">
       <div class="inner_header">
-        <a href="index.html" class="title1">Titan Spot Watch</a>
+        <a href="/" class="title1">Titan Spot Watch</a>
         <nav class="nav_links">
-          <a href="login.html" class="loginbtn">Log in</a>
-          <a href="signup.html" class="signupbtn">Sign up</a>
+          <a href="/login" class="loginbtn">Log in</a>
+          <a href="/signup" class="signupbtn">Sign up</a>
         </nav>
       </div>
     </header>
 
     <main>
       <section class="signup_section">
-        <form class="auth_form" id="signup-form">
+        <form class="auth_form" id="signup-form" method="post" action="/signup">
           <h1>Create your account</h1>
           <p class="auth1">Join Spotter to log where you parked and see real counts.</p>
 
+          {% if error_message %}
+            <p role="alert">{{ error_message }}</p>
+          {% endif %}
+
           <div class="form_group">
-            <label for="signup-name">Full name</label>
-            <input type="text" id="signup-name" name="name" required autocomplete="name" />
+            <label for="signup-first-name">First name</label>
+            <input type="text" id="signup-first-name" name="first_name" required autocomplete="given-name" value="{{ form_data.first_name }}" />
+          </div>
+
+          <div class="form_group">
+            <label for="signup-last-name">Last name</label>
+            <input type="text" id="signup-last-name" name="last_name" required autocomplete="family-name" value="{{ form_data.last_name }}" />
           </div>
 
           <div class="form_group">
             <label for="signup-email">Email</label>
-            <input type="email" id="signup-email" name="email" required autocomplete="email" />
+            <input type="email" id="signup-email" name="email" required autocomplete="email" value="{{ form_data.email }}" />
           </div>
 
           <div class="form_group">
             <label for="signup-password">Password</label>
-            <input type="password" id="signup-password" name="password" required autocomplete="new-password" minlength="8" />
+            <input type="password" id="signup-password" name="password" required autocomplete="new-password" minlength="10" />
           </div>
 
           <div class="form_group">
             <label for="signup-password-confirm">Confirm password</label>
-            <input type="password" id="signup-password-confirm" name="password_confirm" required autocomplete="new-password" minlength="8" />
+            <input type="password" id="signup-password-confirm" name="password_confirm" required autocomplete="new-password" minlength="10" />
           </div>
 
           <button type="submit" class="authbtn">Sign up</button>
 
-          <p class="auth_switch" class="auth_submit">Already have an account?
-            <a href="login.html">Log in</a></p>
+          <p class="auth_switch">Already have an account?
+            <a href="/login">Log in</a></p>
         </form>
       </section>
     </main>
@@ -55,5 +64,6 @@
       <div class="inner_footer">
         <p>Built by CSUF students for CSUF students</p>
       </div>
+    </footer>
   </body>
 </html>

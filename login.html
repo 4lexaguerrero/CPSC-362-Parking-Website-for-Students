@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign Up</title>
+    <title>Log In</title>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
 
     <header class="site_header">
       <div class="inner_header">
-        <a href="index.html" class="title1">Titan Spot Watch</a>
+        <a href="/" class="title1">Titan Spot Watch</a>
         <nav class="nav_links">
-          <a href="login.html" class="loginbtn">Log in</a>
-          <a href="signup.html" class="signupbtn">Sign up</a>
+          <a href="/login" class="loginbtn">Log in</a>
+          <a href="/signup" class="signupbtn">Sign up</a>
         </nav>
       </div>
     </header>
@@ -23,6 +23,9 @@
         <div class="auth_card" id="login-form">
           <h1>Welcome Back</h1>
           <p class="auth1">Log in to see live counts and report where you parked</p>
+          {% if success_message %}
+            <p role="status">{{ success_message }}</p>
+          {% endif %}
 
           <div class="form_group">
             <label for="login-email">Email</label>
@@ -37,7 +40,7 @@
           <button type="submit" class="auth_submit">Log in</button>
 
           <p class="auth_switch">Don't have an account?
-            <a href="signup.html">Sign up</a></p>
+            <a href="/signup">Sign up</a></p>
         </div>
       </section>
     </main>
