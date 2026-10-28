@@ -1,0 +1,170 @@
+/* Dashboard page. Loaded after styles.css, reuses its variables and .board styles. */
+
+.nav_links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav_greeting {
+  color: rgba(246, 244, 238, 0.8);
+  font-size: 0.95rem;
+  margin-right: 4px;
+}
+
+.dash {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 72px;
+}
+
+.dash_title {
+  margin: 0 0 24px;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--deep-navy);
+}
+
+.dash_flash {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: #e4f1e9;
+  border: 1px solid var(--open);
+  color: var(--deep-navy);
+}
+
+.dash_flash_error {
+  background: #f8e4e0;
+  border-color: var(--full);
+}
+
+.dash_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.dash_card {
+  background: #fff;
+  border: 1px solid #D9D5C9;
+  border-radius: 10px;
+  padding: 28px 28px 24px;
+}
+
+.dash_wide {
+  grid-column: 1 / -1;
+}
+
+.dash_card h2 {
+  margin: 0 0 14px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--deep-navy);
+}
+
+.dash_hint {
+  margin: 0 0 18px;
+  color: var(--grey);
+  font-size: 0.95rem;
+}
+
+.parked_now {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--open);
+  background: var(--white);
+  border-radius: 0 6px 6px 0;
+  color: var(--deep-navy);
+}
+
+.parked_label {
+  font-family: var(--font-board);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--grey);
+  text-transform: uppercase;
+}
+
+.parked_time {
+  color: var(--grey);
+  font-size: 0.88rem;
+}
+
+.park_form select {
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 0.98rem;
+  font-family: var(--font-body);
+  border: 1.5px solid #D9D5C9;
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--black);
+}
+
+.park_form select:focus {
+  outline: none;
+  border-color: var(--orange);
+  background: #fff;
+}
+
+.dash_btn {
+  padding: 11px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.dash_btn_secondary {
+  background: transparent;
+  color: var(--deep-navy);
+  border: 1.5px solid var(--navy);
+}
+
+.dash_btn_secondary:hover {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.row-reports {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgba(246, 244, 238, 0.55);
+}
+
+.history_list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history_list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid #ECE8DC;
+}
+
+.history_list li:last-child {
+  border-bottom: none;
+}
+
+.history_time {
+  color: var(--grey);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .dash_grid {
+    grid-template-columns: 1fr;
+  }
+}
