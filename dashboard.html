@@ -1,119 +1,124 @@
 <!DOCTYPE html>
-<html lan="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spotter</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/dashboard.css" />
-  </head>
-  <body>
+<html lang="en">
 
-    <header class="site_header">
-      <div class="inner_header">
-        <a href="/"class="title1">Titan Spot Watch</a>
-        <nav class="nav_links">
-          <span class="nav_greeting">Hi, {{ first_name }}</span>
-          <a href="/dashboard.html" class="loginbtn">Dashboard</a>
-          <a href="/logout" class="signupbtn">Log out</a>
-        </nav>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}" />
+</head>
 
-    <main class="dash">
-      <h1 class="dash_title">Welcome, {{ first_name }}</h1>
+<body>
 
-      {% for category, message in messages %}
-      <p class="dash_flash {{ 'dash_flash_error' if category == 'error' else '' }}"
-      role="{{ 'alert' if category == 'error else 'status }}">{{ message }}</p>
-      {% endfor %}
+  <header class="site_header">
+    <div class="inner_header">
+      <a href="/" class="title1">Titan Spot Watch</a>
+      <nav class="nav_links">
+        <span class="nav_greeting">Hi, {{ first_name }}</span>
+        <a href="/dashboard" class="loginbtn">Dashboard</a>
+        <a href="/logout" class="signupbtn">Log out</a>
+      </nav>
+    </div>
+  </header>
 
-      <div class="dash_grid">
+  <main class="dash">
+    <h1 class="dash_title">Welcome, {{ first_name }}</h1>
 
-        <section class="dash_grid" aria-labelledby="park-heading">
-          <h2 id="park_heading">Where are you parked?</h2>
+    {% for category, message in messages %}
+    <p class="dash_flash {{ 'dash_flash_error' if category == 'error' else '' }}"
+      role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
+    {% endfor %}
 
-          {% if active %}
-          <div class="parked_now">
-            <span class="parked_label">Currently logged</span>
-            <strong>{{ active.structure }}, Level {{ active.level }}</strong>
-            <span class="parked_time"> since {{ active.parked_at | clock }}</span>
-          </div>
-          <form method="post" action="/dashboard/leave">
-            <button type="submit" class="dash_btn dash_btn_secondary">I've left</button>
-          </form>
-          <p class="dash_hint">Parked somewhere new? Log it below and your old spot closes automatically.</p>
-          {% endif %}
+    <div class="dash_grid">
 
-          <form method="post" action="/dashboard/park" class="park_form">
-            <div class="form group">
-              <label for="park-structure">Structure</label>
-              <select id="park-structure" name="structure" required>
-                <option value="" disabled selected>Choose a structure</option>
-                {% for structure in structures %}
-                <option value="{{ s.name }}">{{ s.name }}</option>
-                {% endfor %}
-              </select>
-            </div>
+      <section class="dash_card" aria-labelledby="park-heading">
+        <h2 id="park-heading">Where are you parked?</h2>
 
-            <div class="form group">
-              <label for="park-level">Level</label>
-              <select id="park-level" name="level" required>
-                <option value="" disabled selected>Choose a level</option>
-                {% for level in levels %}
-                <option value="{{ level }}">{{ level }}</option>
-                {% endfor %}
-              </select>
-            </div>
+        {% if active %}
+        <div class="parked_now">
+          <span class="parked_label">Currently logged</span>
+          <strong>{{ active.structure }}, Level {{ active.level }}</strong>
+          <span class="parked_time">since {{ active.parked_at | clock }}</span>
+        </div>
+        <form method="post" action="/dashboard/leave">
+          <button type="submit" class="dash_btn dash_btn_secondary">I've left</button>
+        </form>
+        <p class="dash_hint">Parked somewhere new? Log it below and your old spot closes automatically.</p>
+        {% else %}
+        <p class="dash_hint">Log your spot so everyone sees real counts.</p>
+        {% endif %}
 
-            <button type="submit" class="authbtn">Log my parking</button>
-          </form>
-        </section>
-
-        <section class="board" aria-label="Live aprking structure counts">
-          <div class="board-header">
-            <span class="board-title">Live Structure Counts</span>
-            <span class="board-updated">Open spots · student reports</span>
+        <form method="post" action="/dashboard/park" class="park_form">
+          <div class="form_group">
+            <label for="park-structure">Structure</label>
+            <select id="park-structure" name="structure" required>
+              <option value="" disabled selected>Choose a structure</option>
+              {% for s in structures %}
+              <option value="{{ s.name }}">{{ s.name }}</option>
+              {% endfor %}
+            </select>
           </div>
 
-          <ul class="board_rows">
-            {% for structure in structures %}
-            <li class="board_row" data-status="{{ s.status }}">
-              <span class="row-name">{{ structure.name }}
-              <small class="row-reports">{{ s.reported }} student{{ '' if s.reported == 1 else 's' }}
-                logged</small>
-              </span>
-              <span class="row-count">{{ s.available }}</span>
-            </li>
-            {% endfor %}
-          </ul>
-        </section>
+          <div class="form_group">
+            <label for="park-level">Level</label>
+            <select id="park-level" name="level" required>
+              <option value="" disabled selected>Choose a level</option>
+              {% for level in levels %}
+              <option value="{{ level }}">{{ level }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-        <section class="dash_card dash_wide" aria-labeledby="history-heading">
-          <h2 id="history-heading">Your recent parking</h2>
-          {% if recent %}
-          <ul class="history_list">
-            {% for log in recent %}
-            <li>
-              <span>{{ log.structure }}, Level {{ log.level }}</span>
-              <span class="history_time">
-                {{ log.parked_at | clock }}{% if log.left_at %} · here <now>{% endif %}</now>
-              </span>
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p class="dash_hint">Nothing logged yet. Your first report will show up here.</p>
-          {% endif %}
-        </section>
+          <button type="submit" class="authbtn">Log my parking</button>
+        </form>
+      </section>
 
-      </div>
-    </main>
+      <section class="board" aria-label="Live parking structure counts">
+        <div class="board-head">
+          <span class="board-title">Live Structure Counts</span>
+          <span class="board-updated">Open spots · student reports</span>
+        </div>
 
-    <footer class="site_footer">
-      <div class="inner_footer">
-        <p>Built by CSUF students for CSUF students</p>
-      </div>
-    </footer>
-  </body>
+        <ul class="board_rows">
+          {% for s in structures %}
+          <li class="board_row" data-status="{{ s.status }}">
+            <span class="row-name">
+              {{ s.name }}
+              <small class="row-reports">{{ s.reported }} student{{ '' if s.reported == 1 else 's' }} logged</small>
+            </span>
+            <span class="row-count">{{ s.available }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="dash_card dash_wide" aria-labelledby="history-heading">
+        <h2 id="history-heading">Your recent parking</h2>
+        {% if recent %}
+        <ul class="history_list">
+          {% for log in recent %}
+          <li>
+            <span>{{ log.structure }}, Level {{ log.level }}</span>
+            <span class="history_time">
+              {{ log.parked_at | clock }}{% if not log.left_at %} · here now{% endif %}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="dash_hint">Nothing logged yet. Your first report will show up here.</p>
+        {% endif %}
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site_footer">
+    <div class="inner_footer">
+      <p>Built by CSUF students for CSUF students</p>
+    </div>
+  </footer>
+</body>
+
 </html>

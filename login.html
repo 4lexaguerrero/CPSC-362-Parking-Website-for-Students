@@ -20,11 +20,15 @@
 
     <main>
       <section class="auth_wrap">
-        <div class="auth_card" id="login-form">
+        <form class="auth_card" id="login-form" method="post" action="/login">
           <h1>Welcome Back</h1>
           <p class="auth1">Log in to see live counts and report where you parked</p>
+
           {% if success_message %}
-            <p role="status">{{ success_message }}</p>
+          <p role="status">{{ success_message }}</p>
+          {% endif %}
+          {% if error_message %}
+          <p role="alert">{{ error_message }}</p>
           {% endif %}
 
           <div class="form_group">
@@ -37,11 +41,10 @@
             <input type="password" id="login-password" name="password" required autocomplete="current-password" />
           </div>
 
-          <button type="submit" class="auth_submit">Log in</button>
+          <button type="submit" class="authbtn">Log in</button>
 
-          <p class="auth_switch">Don't have an account?
-            <a href="/signup">Sign up</a></p>
-        </div>
+          <p class="auth_switch">Don't have an account? <a href="/signup">Sign up</a></p>
+        </form>
       </section>
     </main>
 
