@@ -1,24 +1,38 @@
 ﻿from pathlib import Path
+import os
+import secrets
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 from account_creation.account_creation.accountlogic import AccountService
+from account_creation.account_creation.parking import SQLiteParkingRepository
 from account_creation.account_creation.storage import SQLiteUserRepository
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
+PARKING_STRUCTURES = (
+    "Nutwood Structure",
+    "State College Structure",
+    "Eastside North",
+    "Eastside South",
+    "S8 / S10",
+)
+PARKING_LEVELS = ("1", "2", "3", "4", "5")
 
 
-def create_app(account_service=None):
+def create_app(account_service=None, parking_repository=None):
     app = Flask(
         __name__,
         template_folder=str(PROJECT_ROOT),
         static_folder=str(PROJECT_ROOT / "css"),
         static_url_path="/css",
     )
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
+    database_path = str(PROJECT_ROOT / "parking_accounts.db")
     service = account_service or AccountService(
-        SQLiteUserRepository(str(PROJECT_ROOT / "parking_accounts.db"))
+        SQLiteUserRepository(database_path)
     )
+    parking = parking_repository or SQLiteParkingRepository(database_path)
 
     @app.get("/")
     def home():
@@ -77,7 +91,7 @@ def create_app(account_service=None):
             email = request.form.get("email", "")
             password = request.form.get("password", "")
             try:
-                service.login(email, password)
+                user = service.login(email, password)
             except ValueError:
                 return (
                     render_template(
@@ -86,7 +100,10 @@ def create_app(account_service=None):
                     ),
                     401,
                 )
-            return redirect(url_for("home"))
+            session.clear()
+            session["user_id"] = user["user_id"]
+            session["first_name"] = user["first_name"]
+            return redirect(url_for("dashboard"))
 
         return render_template(
             "login.html",
@@ -96,6 +113,51 @@ def create_app(account_service=None):
                 else None
             ),
         )
+
+    @app.get("/dashboard")
+    def dashboard():
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+        user_id = session["user_id"]
+        return render_template(
+            "dashboard.html",
+            first_name=session["first_name"],
+            active=parking.get_active(user_id),
+            recent=parking.get_recent(user_id),
+            parking_structures=PARKING_STRUCTURES,
+            levels=PARKING_LEVELS,
+        )
+
+    @app.post("/dashboard/park")
+    def log_parking():
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+
+        structure = request.form.get("structure", "")
+        level = request.form.get("level", "")
+        if structure not in PARKING_STRUCTURES or level not in PARKING_LEVELS:
+            flash("Choose a valid parking structure and level.", "error")
+            return redirect(url_for("dashboard"))
+
+        parking.log_parking(session["user_id"], structure, level)
+        flash("Your parking location was logged.", "success")
+        return redirect(url_for("dashboard"))
+
+    @app.post("/dashboard/leave")
+    def mark_left():
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+
+        if parking.mark_left(session["user_id"]):
+            flash("Your parking session is marked as ended.", "success")
+        else:
+            flash("There is no active parking location to end.", "error")
+        return redirect(url_for("dashboard"))
+
+    @app.post("/logout")
+    def logout():
+        session.clear()
+        return redirect(url_for("login"))
 
     return app
 

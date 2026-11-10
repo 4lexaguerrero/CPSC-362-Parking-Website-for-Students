@@ -14,8 +14,10 @@
         <a href="/"class="title1">Titan Spot Watch</a>
         <nav class="nav_links">
           <span class="nav_greeting">Hi, {{ first_name }}</span>
-          <a href="/dashboard.html" class="loginbtn">Dashboard</a>
-          <a href="/logout" class="signupbtn">Log out</a>
+          <a href="/dashboard" class="loginbtn">Dashboard</a>
+          <form method="post" action="/logout">
+            <button type="submit" class="signupbtn">Log out</button>
+          </form>
         </nav>
       </div>
     </header>
@@ -23,21 +25,21 @@
     <main class="dash">
       <h1 class="dash_title">Welcome, {{ first_name }}</h1>
 
-      {% for category, message in messages %}
+      {% for category, message in get_flashed_messages(with_categories=true) %}
       <p class="dash_flash {{ 'dash_flash_error' if category == 'error' else '' }}"
-      role="{{ 'alert' if category == 'error else 'status }}">{{ message }}</p>
+      role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
       {% endfor %}
 
       <div class="dash_grid">
 
-        <section class="dash_grid" aria-labelledby="park-heading">
+        <section class="dash_card" aria-labelledby="park-heading">
           <h2 id="park_heading">Where are you parked?</h2>
 
           {% if active %}
           <div class="parked_now">
             <span class="parked_label">Currently logged</span>
             <strong>{{ active.structure }}, Level {{ active.level }}</strong>
-            <span class="parked_time"> since {{ active.parked_at | clock }}</span>
+            <span class="parked_time"> since {{ active.parked_at }}</span>
           </div>
           <form method="post" action="/dashboard/leave">
             <button type="submit" class="dash_btn dash_btn_secondary">I've left</button>
@@ -46,17 +48,17 @@
           {% endif %}
 
           <form method="post" action="/dashboard/park" class="park_form">
-            <div class="form group">
+            <div class="form_group">
               <label for="park-structure">Structure</label>
               <select id="park-structure" name="structure" required>
                 <option value="" disabled selected>Choose a structure</option>
-                {% for structure in structures %}
-                <option value="{{ s.name }}">{{ s.name }}</option>
+                {% for structure in parking_structures %}
+                <option value="{{ structure }}">{{ structure }}</option>
                 {% endfor %}
               </select>
             </div>
 
-            <div class="form group">
+            <div class="form_group">
               <label for="park-level">Level</label>
               <select id="park-level" name="level" required>
                 <option value="" disabled selected>Choose a level</option>
@@ -76,17 +78,7 @@
             <span class="board-updated">Open spots · student reports</span>
           </div>
 
-          <ul class="board_rows">
-            {% for structure in structures %}
-            <li class="board_row" data-status="{{ s.status }}">
-              <span class="row-name">{{ structure.name }}
-              <small class="row-reports">{{ s.reported }} student{{ '' if s.reported == 1 else 's' }}
-                logged</small>
-              </span>
-              <span class="row-count">{{ s.available }}</span>
-            </li>
-            {% endfor %}
-          </ul>
+          <p class="dash_hint">Parking reports are saved to your account history.</p>
         </section>
 
         <section class="dash_card dash_wide" aria-labeledby="history-heading">
@@ -97,7 +89,7 @@
             <li>
               <span>{{ log.structure }}, Level {{ log.level }}</span>
               <span class="history_time">
-                {{ log.parked_at | clock }}{% if log.left_at %} · here <now>{% endif %}</now>
+                {{ log.parked_at }}{% if log.left_at %} · left {{ log.left_at }}{% else %} · still parked{% endif %}
               </span>
             </li>
             {% endfor %}
