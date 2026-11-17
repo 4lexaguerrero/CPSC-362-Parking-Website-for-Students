@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import os
 import secrets
 
@@ -40,7 +40,11 @@ def create_app(account_service=None, parking_repository=None):
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
-        form_data = {"first_name": "", "last_name": "", "email": ""}
+        form_data = {
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+        }
         if request.method == "GET":
             return render_template("signup.html", form_data=form_data)
 
@@ -63,7 +67,7 @@ def create_app(account_service=None, parking_repository=None):
             )
 
         try:
-            account = service.create_account(
+            service.create_account(
                 first_name=form_data["first_name"],
                 last_name=form_data["last_name"],
                 email=form_data["email"],
@@ -79,11 +83,7 @@ def create_app(account_service=None, parking_repository=None):
                 400,
             )
 
-        # New accounts go straight to the dashboard.
-        session["user_id"] = account["user_id"]
-        session["first_name"] = account["first_name"]
-        flash("Account created. Welcome to Spotter!")
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("login", registered="1"))
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
@@ -96,7 +96,7 @@ def create_app(account_service=None, parking_repository=None):
                 return (
                     render_template(
                         "login.html",
-                        error_message="Too many failed attempts. Try again later.",
+                        error_message="Invalid email or password.",
                     ),
                     401,
                 )
@@ -105,37 +105,13 @@ def create_app(account_service=None, parking_repository=None):
             session["first_name"] = user["first_name"]
             return redirect(url_for("dashboard"))
 
-        return render_template("login.html")
-
-    @app.get("/logout")
-    def logout():
-        session.clear()
-        return redirect(url_for("home"))
-
-    @app.get("/dashboard")
-    @login_required
-    def dashboard():
-        user_id = session["user_id"]
-        reported = parking.active_counts()
-        structures = []
-        for name in STRUCTURES:
-            available = OFFICIAL_COUNTS.get(name, 0)
-            structures.append(
-                {
-                    "name": name,
-                    "available": "Full" if available <= 0 else f"{available:,}",
-                    "status": structure_status(available),
-                    "reported": reported.get(name, 0),
-                }
-            )
         return render_template(
-            "dashboard.html",
-            first_name=session.get("first_name", ""),
-            structures=structures,
-            levels=LEVELS,
-            active=parking.get_active(user_id),
-            recent=parking.get_recent(user_id, limit=5),
-            messages=get_flashed_messages(with_categories=True),
+            "login.html",
+            success_message=(
+                "Account created. Please log in."
+                if request.args.get("registered") == "1"
+                else None
+            ),
         )
 
     @app.get("/dashboard")
