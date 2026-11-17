@@ -1,28 +1,4 @@
-<<<<<<< HEAD
-﻿import os
-from datetime import datetime
-from functools import wraps
 from pathlib import Path
-
-from flask import (
-    Flask,
-    flash,
-    get_flashed_messages,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
-
-from account_creation.account_creation.accountlogic import AccountService
-from account_creation.account_creation.parkinglog import (
-    LEVELS,
-    STRUCTURES,
-    ParkingLogRepository,
-)
-=======
-﻿from pathlib import Path
 import os
 import secrets
 
@@ -30,44 +6,10 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 
 from account_creation.account_creation.accountlogic import AccountService
 from account_creation.account_creation.parking import SQLiteParkingRepository
->>>>>>> main
 from account_creation.account_creation.storage import SQLiteUserRepository
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-<<<<<<< HEAD
-DB_PATH = str(PROJECT_ROOT / "parking_accounts.db")
-
-# Placeholder "official" numbers until the CSUF scraper is hooked in.
-OFFICIAL_COUNTS = {
-    "Nutwood Structure": 582,
-    "State College Structure": 1054,
-    "Eastside North": 391,
-    "Eastside South": 0,
-    "S8 / S10": 47,
-}
-
-
-def structure_status(available):
-    if available <= 0:
-        return "full"
-    if available < 100:
-        return "low"
-    return "open"
-
-
-def login_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if "user_id" not in session:
-            return redirect(url_for("login"))
-        return view(*args, **kwargs)
-
-    return wrapped
-
-
-def create_app(account_service=None, parking_repo=None):
-=======
 PARKING_STRUCTURES = (
     "Nutwood Structure",
     "State College Structure",
@@ -79,31 +21,18 @@ PARKING_LEVELS = ("1", "2", "3", "4", "5")
 
 
 def create_app(account_service=None, parking_repository=None):
->>>>>>> main
     app = Flask(
         __name__,
         template_folder=str(PROJECT_ROOT),
         static_folder=str(PROJECT_ROOT / "css"),
         static_url_path="/css",
     )
-<<<<<<< HEAD
-    # Signs the session cookie. Set SECRET_KEY in your environment for real use.
-    app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
-
-    service = account_service or AccountService(SQLiteUserRepository(DB_PATH))
-    parking = parking_repo or ParkingLogRepository(DB_PATH)
-
-    @app.template_filter("clock")
-    def clock(timestamp):
-        return datetime.fromtimestamp(timestamp).strftime("%b %d, %I:%M %p")
-=======
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
     database_path = str(PROJECT_ROOT / "parking_accounts.db")
     service = account_service or AccountService(
         SQLiteUserRepository(database_path)
     )
     parking = parking_repository or SQLiteParkingRepository(database_path)
->>>>>>> main
 
     @app.get("/")
     def home():
@@ -163,17 +92,7 @@ def create_app(account_service=None, parking_repository=None):
             password = request.form.get("password", "")
             try:
                 user = service.login(email, password)
-<<<<<<< HEAD
-            except ValueError as error:
-                return (
-                    render_template("login.html", error_message=str(error)),
-                    401,
-                )
-            except RuntimeError:
-                # Lockout tried to send a verification email but none is configured.
-=======
             except ValueError:
->>>>>>> main
                 return (
                     render_template(
                         "login.html",
@@ -181,10 +100,7 @@ def create_app(account_service=None, parking_repository=None):
                     ),
                     401,
                 )
-<<<<<<< HEAD
-=======
             session.clear()
->>>>>>> main
             session["user_id"] = user["user_id"]
             session["first_name"] = user["first_name"]
             return redirect(url_for("dashboard"))
@@ -222,30 +138,6 @@ def create_app(account_service=None, parking_repository=None):
             messages=get_flashed_messages(with_categories=True),
         )
 
-<<<<<<< HEAD
-    @app.post("/dashboard/park")
-    @login_required
-    def log_parking():
-        try:
-            parking.log_parking(
-                session["user_id"],
-                request.form.get("structure", ""),
-                request.form.get("level", ""),
-            )
-        except ValueError as error:
-            flash(str(error), "error")
-        else:
-            flash("Parking logged. Thanks for helping fellow students!")
-        return redirect(url_for("dashboard"))
-
-    @app.post("/dashboard/leave")
-    @login_required
-    def leave_parking():
-        parking.mark_left(session["user_id"])
-        flash("Marked as left. Safe travels!")
-        return redirect(url_for("dashboard"))
-
-=======
     @app.get("/dashboard")
     def dashboard():
         if "user_id" not in session:
@@ -291,7 +183,6 @@ def create_app(account_service=None, parking_repository=None):
         session.clear()
         return redirect(url_for("login"))
 
->>>>>>> main
     return app
 
 
