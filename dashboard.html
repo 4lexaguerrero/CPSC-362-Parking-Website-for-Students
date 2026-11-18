@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lan="en">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -107,7 +107,7 @@
         <p>Built by CSUF students for CSUF students</p>
       </div>
     </footer>
-
+    {% if not active %}
     <script>
       const structureLevels = {{ structure_levels | tojson }};
         const structureSelect = document.getElementById("park-structure");
@@ -129,6 +129,10 @@
             option.value = level;
             option.textContent = level;
             levelSelect.appendChild(option);
+          }
+
+          if (levels.length == 0) {
+            levelSelect.value = levels[0];
           }
           levelSelect.disabled = levels.length === 0;
         });
