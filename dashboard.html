@@ -39,12 +39,12 @@
           <div class="parked_now">
             <span class="parked_label">Currently logged</span>
             <strong>{{ active.structure }}, Level {{ active.level }}</strong>
-            <span class="parked_time"> since {{ active.parked_at }}</span>
+            <span class="parked_time"> since {{ active.parked_at | clock }}</span>
           </div>
           <form method="post" action="/dashboard/leave">
             <button type="submit" class="dash_btn dash_btn_secondary">I've left</button>
           </form>
-          <p class="dash_hint">Parked somewhere new? Log it below and your old spot closes automatically.</p>
+          <p class="dash_hint">Parked somewhere new? Mark yourself as left before logging a new spot.</p>
           {% endif %}
 
           <form method="post" action="/dashboard/park" class="park_form">
@@ -60,7 +60,7 @@
 
             <div class="form_group">
               <label for="park-level">Level</label>
-              <select id="park-level" name="level" required>
+              <select id="park-level" name="level" required disabled>
                 <option value="" disabled selected>Choose a level</option>
                 {% for level in levels %}
                 <option value="{{ level }}">{{ level }}</option>
@@ -72,7 +72,7 @@
           </form>
         </section>
 
-        <section class="board" aria-label="Live aprking structure counts">
+        <section class="board" aria-label="Live parking structure counts">
           <div class="board-header">
             <span class="board-title">Live Structure Counts</span>
             <span class="board-updated">Open spots · student reports</span>
@@ -89,7 +89,7 @@
             <li>
               <span>{{ log.structure }}, Level {{ log.level }}</span>
               <span class="history_time">
-                {{ log.parked_at }}{% if log.left_at %} · left {{ log.left_at }}{% else %} · still parked{% endif %}
+                {{ log.parked_at | clock}}{% if log.left_at %} · left {{ log.left_at | clock }}{% else %} · still parked{% endif %}
               </span>
             </li>
             {% endfor %}
@@ -107,5 +107,32 @@
         <p>Built by CSUF students for CSUF students</p>
       </div>
     </footer>
+
+    <script>
+      const structureLevels = {{ structure_levels | tojson }};
+        const structureSelect = document.getElementById("park-structure");
+        const levelSelect = document.getElementById("park-level");
+
+        structureSelect.addEventListener("change", () => {
+          const levels = structureLevels[structureSelect.value] || [];
+          levelSelect.innerHTML = "";
+
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = "Choose a level";
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          levelSelect.appendChild(placeholder);
+
+          for (const level of levels) {
+            const option = document.createElement("option");
+            option.value = level;
+            option.textContent = level;
+            levelSelect.appendChild(option);
+          }
+          levelSelect.disabled = levels.length === 0;
+        });
+    </script>
+    {% endif %}
   </body>
 </html>

@@ -1,23 +1,24 @@
-﻿from pathlib import Path
+﻿from datetime import datetime
+from pathlib import Path
 import os
 import secrets
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 from account_creation.account_creation.accountlogic import AccountService
-from account_creation.account_creation.parking import SQLiteParkingRepository
+from account_creation.account_creation.parking import (
+    ActiveParkingError,
+    SQLiteParkingRepository,
+)
 from account_creation.account_creation.storage import SQLiteUserRepository
+from account_creation.account_creation.structures import (
+    PARKING_STRUCTURES,
+    STRUCTURE_LEVELS,
+    is_valid_spot,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-PARKING_STRUCTURES = (
-    "Nutwood Structure",
-    "State College Structure",
-    "Eastside North",
-    "Eastside South",
-    "S8 / S10",
-)
-PARKING_LEVELS = ("1", "2", "3", "4", "5")
 
 
 def create_app(account_service=None, parking_repository=None):
@@ -33,6 +34,14 @@ def create_app(account_service=None, parking_repository=None):
         SQLiteUserRepository(database_path)
     )
     parking = parking_repository or SQLiteParkingRepository(database_path)
+
+    @app.template_filter("clock")
+    def clock(value):
+        """Turn a stored UTC timestamp into e.g. 'Nov 08, 02:00 PM' (server local time)."""
+        try:
+            return datetime.fromisoformat(value).astimezone().strftime("%b %d, %I:%M %p")
+        except (TypeError, ValueError):
+            return value
 
     @app.get("/")
     def home():
@@ -100,6 +109,15 @@ def create_app(account_service=None, parking_repository=None):
                     ),
                     401,
                 )
+            except RuntimeError:
+                # Lockout tried to send a verification email but no sender is set up yet.
+                return (
+                    render_template(
+                        "login.html",
+                        error_message="Too many failed attempts. Please try again later.",
+                    ),
+                    429,
+                )
             session.clear()
             session["user_id"] = user["user_id"]
             session["first_name"] = user["first_name"]
@@ -125,7 +143,7 @@ def create_app(account_service=None, parking_repository=None):
             active=parking.get_active(user_id),
             recent=parking.get_recent(user_id),
             parking_structures=PARKING_STRUCTURES,
-            levels=PARKING_LEVELS,
+            structure_levels=STRUCTURE_LEVELS,
         )
 
     @app.post("/dashboard/park")
@@ -135,11 +153,16 @@ def create_app(account_service=None, parking_repository=None):
 
         structure = request.form.get("structure", "")
         level = request.form.get("level", "")
-        if structure not in PARKING_STRUCTURES or level not in PARKING_LEVELS:
+        if not is_valid_spot(structure, level):
             flash("Choose a valid parking structure and level.", "error")
             return redirect(url_for("dashboard"))
 
-        parking.log_parking(session["user_id"], structure, level)
+        try:
+            parking.log_parking(session["user_id"], structure, level)
+        except ActiveParkingError as error:
+            flash(str(error), "error")
+            return redirect(url_for("dashboard"))
+
         flash("Your parking location was logged.", "success")
         return redirect(url_for("dashboard"))
 
